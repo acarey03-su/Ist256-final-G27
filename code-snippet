@@ -1,6 +1,6 @@
 import json
 import requests
-api_key = '74c9eb16f66170a6a6785dbf2204df3d'
+api_key = 'API KEY'
 sports_response = requests.get('https://api.the-odds-api.com/v3/sports', params={
     'api_key': api_key
 })
