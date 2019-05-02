@@ -1,0 +1,50 @@
+import json
+import requests
+api_key = '74c9eb16f66170a6a6785dbf2204df3d'
+sports_response = requests.get('https://api.the-odds-api.com/v3/sports', params={
+    'api_key': api_key
+})
+
+sports_json = json.loads(sports_response.text)
+
+if not sports_json['success']:
+    print(
+        'There was a problem with the sports request:',
+        sports_json['msg']
+    )
+
+else:
+    print()
+    print(
+        'Successfully got {} sports'.format(len(sports_json['data'])),
+        'Here\'s the first sport:'
+    )
+    print(sports_json['data'][0].keys())
+
+sport_key = 'upcoming'
+
+odds_response = requests.get('https://api.the-odds-api.com/v3/odds', params={
+    'api_key': api_key,
+    'sport': sport_key,
+    'region': 'uk',
+    'mkt': 'h2h'
+})
+
+odds_json = json.loads(odds_response.text)
+if not odds_json['success']:
+    print(
+        'There was a problem with the odds request:',
+        odds_json['msg']
+    )
+
+else:
+    print()
+    print(
+        'Successfully got {} events'.format(len(odds_json['data'])),
+        'Here\'s the first event:'
+    )
+    print(odds_json['data'][0])
+
+    print()
+    print('Remaining requests', odds_response.headers['x-requests-remaining'])
+    print('Used requests', odds_response.headers['x-requests-used'])
