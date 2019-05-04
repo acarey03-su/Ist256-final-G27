@@ -1,0 +1,8 @@
+def sports_input():
+    if sport == 'sport_nice':
+        team = input("Please enter the team you would like to bet on: ")
+    elif team == 'teams':
+        amount = float(input("Please enter the amount you would like to bet in USD: "))
+        betting = amount * ['odds']['h2h'][0]
+    else:
+        print("Sorry please try again")
