@@ -1,0 +1,83 @@
+import json
+import requests
+
+# Sets parameters for API request
+api_key = '74c9eb16f66170a6a6785dbf2204df3d'
+sport_key = 'upcoming'
+
+# API request
+odds_response = requests.get('https://api.the-odds-api.com/v3/odds', params={
+    'api_key': api_key,
+    'sport': sport_key,
+    'region': 'us',
+    'mkt': 'h2h'})
+
+# Optional number of requests left
+#print('Remaining requests', odds_response.headers['x-requests-remaining'])
+#print('Used requests', odds_response.headers['x-requests-used'], '\n')
+
+# Makes json readable for python
+odds_json = json.loads(odds_response.text)
+
+# Ensures data was successfully requested and converted
+if not odds_json['success']:
+    
+    # Error message if data request fails
+    print('There was a problem with the odds request:',
+          odds_json['msg'])
+
+# Main logic     
+else:
+    # Initializes some variables
+    n = 0 # Which event from list to grab (0 is most upcoming)
+    team = 0 # Initializes team number for input validation
+    bet = 0 # Initializes bet for input validation
+    
+    # Determines the team names and the league of next event using json data
+    teams = odds_json['data'][n].get('teams')
+    league = odds_json['data'][n].get('sport_nice')
+    
+    # Prints the league and the two team names
+    print('The next game is in the {}.'.format(league))
+    print('Team #1:', teams[0])
+    print('Team #2:', teams[1])
+    
+    # Asks user if they would like to bet
+    betting = input('Would you like to place a bet? -> ')
+    
+    # Strips whitespace from users answer and makes all lowercase
+    betting = betting.lower()
+    betting = betting.strip()
+    
+    # Checks users answer
+    if betting == 'yes' or betting == 'y':
+        
+        # Prompts user for team number with input validation (must be '1' or '2')
+        while team != 1 and team != 2:
+            team = int(input('Which team number would like to bet on? -> '))
+            if team != 1 and team != 2:
+                print('Please enter a valid team number.')
+        # Subtracts 1 from team for use in indexing (i.e. team 1 is index 0 etc.)
+        team = team - 1
+        
+        # Prompts user for a bet with input validation (must be greater than 0)
+        while bet <= 0:
+            bet = input('How much would you like to bet? -> ')
+            # Removes dollar sign and converts to float
+            bet = bet.replace('$', '')
+            bet = float(bet)
+            if bet <= 0:
+                print('Please enter a valid bet.')
+                
+        # Determines betting odds for the chosen team using json data
+        odds = odds_json['data'][0]['sites'][0].get('odds').get('h2h')[team]
+        
+        # Calculates winnings
+        winnings = (bet * odds) - bet
+        
+        # Outputs the profit
+        print('\nYou could win ${0:.2f} profit.'.format(winnings))
+        
+    else:
+        # Prints no betting if user doesn't want to bet
+        print('Ok, no betting on this game.')
